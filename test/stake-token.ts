@@ -1,5 +1,4 @@
-import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
-import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
+import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { parseEther } from '@ethersproject/units';
@@ -61,7 +60,7 @@ describe("Stake token test", async function () {
     });
 
     it("Check changing totalSupply after claim", async function () {
-      const { stakeToken, owner, user1, user2, user3, totalSupply, defaultUserBalance } = await loadFixture(deployStakeTokenAndPrepare);
+      const { stakeToken, user1, totalSupply, defaultUserBalance } = await loadFixture(deployStakeTokenAndPrepare);
       const hoursQuantity = 60 * 60 * 10.3; // 10.3 hours
       const estimatedRewards = parseEther(((10_000 / 10) * 10.3).toString());
       await stakeToken.connect(user1).stake(defaultUserBalance);
@@ -71,7 +70,7 @@ describe("Stake token test", async function () {
     });
 
     it("Check correct work unstake",async function () {
-      const { stakeToken, owner, user1, user2, user3, totalSupply, defaultUserBalance } = await loadFixture(deployStakeTokenAndPrepare);
+      const { stakeToken, user1, defaultUserBalance } = await loadFixture(deployStakeTokenAndPrepare);
       const aDay = 60 * 60 * 24;
       await stakeToken.connect(user1).stake(defaultUserBalance);
       expect(await stakeToken.balanceOf(user1.address)).to.equal(0);
@@ -84,29 +83,29 @@ describe("Stake token test", async function () {
 
   describe("Check staking requires", function () {
     it("Repeated stake", async function () {
-      const { stakeToken, owner, user1, user2, user3, totalSupply, defaultUserBalance } = await loadFixture(deployStakeTokenAndPrepare);
+      const { stakeToken, user1, defaultUserBalance } = await loadFixture(deployStakeTokenAndPrepare);
       await stakeToken.connect(user1).stake(defaultUserBalance.div(2));
       await expect(stakeToken.connect(user1).stake(defaultUserBalance.div(2))).to.be.revertedWith("Your tokens is staked arleady.");
     });
 
     it("Zero stake", async function () {
-      const { stakeToken, owner, user1, user2, user3, totalSupply, defaultUserBalance } = await loadFixture(deployStakeTokenAndPrepare);
+      const { stakeToken, user1 } = await loadFixture(deployStakeTokenAndPrepare);
       await expect(stakeToken.connect(user1).stake(0)).to.be.revertedWith("Amount must be greater then zero.");
     });
 
     it("Claim without stake", async function () {
-      const { stakeToken, owner, user1, user2, user3, totalSupply, defaultUserBalance } = await loadFixture(deployStakeTokenAndPrepare);
+      const { stakeToken, user1 } = await loadFixture(deployStakeTokenAndPrepare);
       await expect(stakeToken.connect(user1).claim()).to.be.revertedWith("Your tokens is not staked yet.");
     });
 
     it("Checking claim by time", async function () {
-      const { stakeToken, owner, user1, user2, user3, totalSupply, defaultUserBalance } = await loadFixture(deployStakeTokenAndPrepare);
+      const { stakeToken, user1, defaultUserBalance } = await loadFixture(deployStakeTokenAndPrepare);
       await stakeToken.connect(user1).stake(defaultUserBalance);
       await expect(stakeToken.connect(user1).claim()).to.be.revertedWith("It's been less than an hour.");
     });
 
     it("Repeated unstake", async function () {
-      const { stakeToken, owner, user1, user2, user3, totalSupply, defaultUserBalance } = await loadFixture(deployStakeTokenAndPrepare);
+      const { stakeToken, user1, defaultUserBalance } = await loadFixture(deployStakeTokenAndPrepare);
       await stakeToken.connect(user1).stake(defaultUserBalance);
       const aDay = 60 * 60 * 24;
       await timeMovement(aDay);
@@ -115,7 +114,7 @@ describe("Stake token test", async function () {
     });
 
     it("Checking unstake by time", async function () {
-      const { stakeToken, owner, user1, user2, user3, totalSupply, defaultUserBalance } = await loadFixture(deployStakeTokenAndPrepare);
+      const { stakeToken, user1, defaultUserBalance } = await loadFixture(deployStakeTokenAndPrepare);
       await stakeToken.connect(user1).stake(defaultUserBalance);
       const halfDay = 60 * 60 * 12;
       await timeMovement(halfDay);

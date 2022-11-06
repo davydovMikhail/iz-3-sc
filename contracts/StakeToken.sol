@@ -25,20 +25,19 @@ contract StakeToken is ERC20 {
 
     function stake(uint256 _amount) external {
         address sender = _msgSender();
+        User storage info = users[sender];
         uint currentTime = block.timestamp;
         require(_amount > 0, "Amount must be greater then zero.");
-        require(users[sender].stakedAmount == 0, "Your tokens is staked arleady.");
+        require(info.stakedAmount == 0, "Your tokens is staked arleady.");
         _transfer(sender, address(this), _amount);
-        users[sender] = User({
-            stakedAmount: _amount,
-            stakeTime: currentTime,
-            claimTime: currentTime
-        });
+        info.stakedAmount = _amount;
+        info.stakeTime = currentTime;
+        info.claimTime = currentTime;
     }
 
     function claim() external {
         address sender = _msgSender();
-         uint currentTime = block.timestamp;
+        uint currentTime = block.timestamp;
         User storage info = users[sender];
         require(info.stakedAmount > 0, "Your tokens is not staked yet.");
         uint distantSeconds = currentTime - info.claimTime;
