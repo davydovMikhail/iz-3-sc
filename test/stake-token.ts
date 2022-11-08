@@ -78,15 +78,20 @@ describe("Stake token test", async function () {
       await stakeToken.connect(user1).unstake();
       expect(await stakeToken.balanceOf(user1.address)).to.equal(defaultUserBalance);
     });
+
+    it("Repeated stake and unstake", async function () {
+      const { stakeToken, user1, defaultUserBalance } = await loadFixture(deployStakeTokenAndPrepare);
+      await stakeToken.connect(user1).stake(defaultUserBalance.div(2));
+      await stakeToken.connect(user1).stake(defaultUserBalance.div(2));
+      const aDay = 60 * 60 * 24;
+      await timeMovement(aDay);
+      await stakeToken.connect(user1).unstake();
+      expect(await stakeToken.balanceOf(user1.address)).to.equal(defaultUserBalance);
+    });
     
   });
 
   describe("Check staking requires", function () {
-    it("Repeated stake", async function () {
-      const { stakeToken, user1, defaultUserBalance } = await loadFixture(deployStakeTokenAndPrepare);
-      await stakeToken.connect(user1).stake(defaultUserBalance.div(2));
-      await expect(stakeToken.connect(user1).stake(defaultUserBalance.div(2))).to.be.revertedWith("Your tokens is staked arleady.");
-    });
 
     it("Zero stake", async function () {
       const { stakeToken, user1 } = await loadFixture(deployStakeTokenAndPrepare);

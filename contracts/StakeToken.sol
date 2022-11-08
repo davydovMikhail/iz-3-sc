@@ -28,9 +28,9 @@ contract StakeToken is ERC20 {
         User storage info = users[sender];
         uint currentTime = block.timestamp;
         require(_amount > 0, "Amount must be greater then zero.");
-        require(info.stakedAmount == 0, "Your tokens is staked arleady.");
+        // require(info.stakedAmount == 0, "Your tokens is staked arleady.");
         _transfer(sender, address(this), _amount);
-        info.stakedAmount = _amount;
+        info.stakedAmount += _amount;
         info.stakeTime = currentTime;
         info.claimTime = currentTime;
     }
